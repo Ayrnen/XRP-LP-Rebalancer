@@ -1,11 +1,11 @@
 from classes.config_reader import ConfigReader
 
-class ETHLAddressClient:
+class XRPLAddressClient:
     def __init__(self, address):
         self.config = ConfigReader()
         self.address = address
         
-    def get_balance_eth(self):
+    def get_balance_xrp(self):
         pass
     
     def get_balance_token(self, token_address):
