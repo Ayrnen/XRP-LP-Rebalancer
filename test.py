@@ -15,4 +15,6 @@ class Placeholder:
 if __name__ == '__main__':
 
     address = os.getenv('ADDRESS')
-    address_client = XRPLAddressClient()
+    address_client = XRPLAddressClient(address)
+
+    print(address_client.get_balance_xrp())
