@@ -12,7 +12,6 @@ class RPCClient:
 
         load_dotenv()
         self.api_key = os.getenv('API_KEY')
-        self.api_key = ''
 
         self.config = ConfigReader()
 
