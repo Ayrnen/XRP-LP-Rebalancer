@@ -57,7 +57,7 @@ class RPCClient:
             return False, f'Connection failed: {str(e)}'
         
 
-    def get_xrp_balance(self, address):
+    def get_account_balance(self, address):
         payload = {
             'method': 'account_info',
             'params': [{
