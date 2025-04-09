@@ -1,11 +1,18 @@
 from classes.config_reader import ConfigReader
 from classes.rpc_client import RPCClient
+from xrpl.core import addresscodec
 
 class XRPLAddressClient:
     def __init__(self, address):
         self.config = ConfigReader()
         self.rpc = RPCClient()
         self.address = address
+
+    def _validate_address(self):
+        try:
+            return addresscodec.is_valid_classic_address(self.address)
+        except:
+            return False
         
     def get_balance_xrp(self):
         return self.rpc.get_account_balance(self.address)
