@@ -18,31 +18,40 @@ class RPCClient:
         self.ws_url = self.config.get_value('rpc-links', 'mainnet_wss') + self.api_key
         self.http_url = self.config.get_value('rpc-links', 'mainnet_https') + self.api_key
 
-        # self.web3 = Web3(Web3.HTTPProvider(self.http_url))
-        # if not self.web3.is_connected():
-        #     raise ConnectionError('Failed to connect to Web3 provider')
+    def validate_connection_wss(self):
+        print(self.ws_url)
+        try:
+            # Create connection with 5-second timeout
+            ws = websocket.create_connection(
+                self.ws_url,
+                # header=["Authorization: Bearer {}".format(self.api_key)],
+                timeout=5
+            )
+            
+            # Test connection with ping/pong
+            ws.ping()
+            ws.close()
+            return True, "WebSocket connection successful"
+            
+        except websocket.WebSocketTimeoutException:
+            return False, "Connection timed out (5s)"
+        except websocket.WebSocketBadStatusException as e:
+            return False, f"Auth failed: {e}"
+        except Exception as e:
+            return False, f"WebSocket error: {str(e)}"
 
-    def get_account_balance(self, address):
-        payload = {
-            'method': 'account_info',
-            'params': [
-                {
-                    'account': address,
-                    'strict': True,
-                    'ledger_index': 'validated',
-                    'queue': True
-                }
-            ]
-        }
-        headers = {
-            'Content-Type': 'application/json'
-        }
-        
-        response = requests.post(self.http_url, json=payload, headers=headers)
-        
-        if response.status_code == 200:
-            result = response.json()
-            balance = result['result']['account_data']['Balance']
-            return balance
-        else:
-            raise Exception(f'HTTP Error: {response.status_code}, {response.text}')
+    def validate_connection_http(self):
+        try:
+            response = requests.post(
+                url=self.http_url,
+                json={"method": "server_info", "params": [{}]},
+                timeout=5
+            )
+            
+            # Check for successful response
+            if response.status_code == 200:
+                return True, "Connection validated successfully"
+            return False, f"Server returned {response.status_code} status"
+
+        except requests.exceptions.RequestException as e:
+            return False, f"Connection failed: {str(e)}"
