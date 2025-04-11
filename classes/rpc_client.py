@@ -90,8 +90,8 @@ class RPCClient:
 
     def get_amm_position(self, address, token1: str, token2: str):
         try:
-            asset1 = self._validate_token_input(token1)
-            asset2 = self._validate_token_input(token2)
+            asset1 = self._validate_parse_token(token1)
+            asset2 = self._validate_parse_token(token2)
             
             payload = {
                 'method': 'amm_info',
@@ -118,7 +118,7 @@ class RPCClient:
         except Exception as e:
             return None, f'Connection error: {str(e)}'
         
-    def _validate_token_input(self, token: str) -> dict:
+    def _validate_parse_token(self, token: str) -> dict:
         if token.upper() == 'XRP':
             return {'currency': 'XRP'}
             
