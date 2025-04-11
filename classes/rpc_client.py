@@ -4,7 +4,7 @@ import json
 from dotenv import load_dotenv
 from classes.config_reader import ConfigReader
 import os
-
+from xrpl.core import addresscodec
 
 
 class RPCClient:
@@ -86,3 +86,46 @@ class RPCClient:
             return None, 'Invalid JSON response'
         except KeyError:
             return None, 'Unexpected response format'
+        
+
+    def get_amm_position(self, address, token1: str, token2: str):
+        try:
+            # Validate assets
+            asset1 = self._parse_asset(token1)
+            asset2 = self._parse_asset(token2)
+            
+            payload = {
+                'method': 'amm_info',
+                'params': [{
+                    'asset': asset1,
+                    'asset2': asset2,
+                    'account': address
+                }]
+            }
+            response = requests.post(
+                self.http_url,
+                json=payload,
+                timeout=5
+            )
+            
+            data = response.json()
+            if error := data.get('error'):
+                return None, error.get('message', 'Unknown RPC error')
+                
+            return data.get('result'), None
+
+        except ValueError as e:
+            return None, str(e)
+        except Exception as e:
+            return None, f'Connection error: {str(e)}'
+        
+    def _parse_asset(self, token: str) -> dict:
+        if token.upper() == 'XRP':
+            return {'currency': 'XRP'}
+            
+        if ':' in token:
+            currency, issuer = token.split(':', 1)
+            if addresscodec.is_valid_classic_address(issuer):
+                return {'currency': currency, 'issuer': issuer}
+                
+        raise ValueError(f'Invalid asset format: {token}')
