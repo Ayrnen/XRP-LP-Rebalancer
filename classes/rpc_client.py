@@ -90,9 +90,8 @@ class RPCClient:
 
     def get_amm_position(self, address, token1: str, token2: str):
         try:
-            # Validate assets
-            asset1 = self._parse_asset(token1)
-            asset2 = self._parse_asset(token2)
+            asset1 = self._validate_token_input(token1)
+            asset2 = self._validate_token_input(token2)
             
             payload = {
                 'method': 'amm_info',
@@ -119,13 +118,14 @@ class RPCClient:
         except Exception as e:
             return None, f'Connection error: {str(e)}'
         
-    def _parse_asset(self, token: str) -> dict:
+    def _validate_token_input(self, token: str) -> dict:
         if token.upper() == 'XRP':
             return {'currency': 'XRP'}
             
         if ':' in token:
             currency, issuer = token.split(':', 1)
-            if addresscodec.is_valid_classic_address(issuer):
+            if addresscodec.is_valid_classic_address(issuer)\
+            and (len(currency) == 3 or len(currency) == 40):
                 return {'currency': currency, 'issuer': issuer}
                 
         raise ValueError(f'Invalid asset format: {token}')
