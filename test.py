@@ -13,15 +13,25 @@ class Placeholder:
 
 
 if __name__ == '__main__':
+    runtime_tracker = RuntimeTracker()
+    runtime_tracker.start()
+    load_dotenv()
+    address = os.getenv('ADDRESS')
+    address_client = XRPLAddressClient(address)
+    config_reader = ConfigReader()
+    
+
     # rpc = RPCClient()
     # connected, status_message = rpc.validate_connection_http()
     # print(f"Connected: {connected} | Status: {status_message}")
 
     # connected, status_message = rpc.validate_connection_wss()
     # print(f"Connected: {connected} | Status: {status_message}")
-    load_dotenv()
-    address = os.getenv('ADDRESS')
-    address_client = XRPLAddressClient(address)
- 
-    print(address_client._validate_address())
-    print(address_client.get_balance_xrp())
+     
+    # print(address_client._validate_address())
+    # print(address_client.get_balance_xrp())
+
+    rlusd = config_reader.get_value('mainnet-token-addresses', 'rlusd')
+    print(address_client.get_lp_position('XRP', rlusd))
+
+    runtime_tracker.stop()
