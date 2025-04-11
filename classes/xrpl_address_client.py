@@ -33,8 +33,8 @@ class XRPLAddressClient:
     def get_transaction_count(self):
         pass
     
-    def get_lp_position(self, lp_address, lp_abi):
-        pass
+    def get_lp_position(self, token1, token2):
+        return self.rpc.get_amm_position(self.address, token1, token2)
 
     async def get_pending_txns(self):
         pass
