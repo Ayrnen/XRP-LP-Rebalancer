@@ -21,14 +21,7 @@ class RPCClient:
     def validate_connection_wss(self):
         print(self.ws_url)
         try:
-            # Create connection with 5-second timeout
-            ws = websocket.create_connection(
-                self.ws_url,
-                # header=['Authorization: Bearer {}'.format(self.api_key)],
-                timeout=5
-            )
-            
-            # Test connection with ping/pong
+            ws = websocket.create_connection(self.ws_url, timeout=5)
             ws.ping()
             ws.close()
             return True, 'WebSocket connection successful'
@@ -41,6 +34,7 @@ class RPCClient:
             return False, f'WebSocket error: {str(e)}'
 
     def validate_connection_http(self):
+        print(self.http_url)
         try:
             response = requests.post(
                 url=self.http_url,
@@ -48,7 +42,6 @@ class RPCClient:
                 timeout=5
             )
             
-            # Check for successful response
             if response.status_code == 200:
                 return True, 'Connection validated successfully'
             return False, f'Server returned {response.status_code} status'
@@ -81,8 +74,6 @@ class RPCClient:
             balance_drops = data.get('result', {})\
                                 .get('account_data', {})\
                                 .get('Balance')
-            
-            print(data.get('result', {}))
             
             if not balance_drops:
                 return None, 'No balance found in response'
