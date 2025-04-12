@@ -88,7 +88,7 @@ class RPCClient:
             return None, 'Unexpected response format'
         
 
-    def get_amm_position(self, address, token1: str, token2: str):
+    def get_amm_details(self, issuer, token1, token2):
         try:
             asset1 = self._validate_parse_token(token1)
             asset2 = self._validate_parse_token(token2)
@@ -98,7 +98,7 @@ class RPCClient:
                 'params': [{
                     'asset': asset1,
                     'asset2': asset2,
-                    'account': address
+                    'account': 'rsmjkQ2gVj9wDHAFRrj1XS9yayWjp7Tq7b'
                 }]
             }
             response = requests.post(
