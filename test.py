@@ -2,6 +2,7 @@ from classes.config_reader import ConfigReader
 from classes.runtime_tracker import RuntimeTracker
 from classes.rpc_client import RPCClient
 from classes.xrpl_address_client import XRPLAddressClient
+from classes.amm_client import AMMClient
 
 from dotenv import load_dotenv
 import os
@@ -15,11 +16,7 @@ class Placeholder:
 if __name__ == '__main__':
     runtime_tracker = RuntimeTracker()
     runtime_tracker.start()
-    load_dotenv()
-    address = os.getenv('ADDRESS')
-    address_client = XRPLAddressClient(address)
     config_reader = ConfigReader()
-    
 
     # rpc = RPCClient()
     # connected, status_message = rpc.validate_connection_http()
@@ -28,10 +25,18 @@ if __name__ == '__main__':
     # connected, status_message = rpc.validate_connection_wss()
     # print(f"Connected: {connected} | Status: {status_message}")
      
+    # load_dotenv()
+    # address = os.getenv('TEST_ADDRESS')
+    # address_client = XRPLAddressClient(address)
     # print(address_client._validate_address())
     # print(address_client.get_balance_xrp())
 
-    rlusd = config_reader.get_value('mainnet-token-addresses', 'rlusd')
-    print(address_client.get_lp_position('XRP', rlusd))
+    amm = AMMClient()
+    token1 = 'XRP'
+    token2 = config_reader.get_value('mainnet-token-addresses', 'rlusd')
+    issuer = config_reader.get_value('mainnet-amm-info', 'xrp_rlusd_issuer')
+    amm_info = amm.get_amm_details(issuer, token1, token2)
+    print(amm_info)
+    
 
     runtime_tracker.stop()
