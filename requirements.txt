@@ -1,2 +1,5 @@
 boto3
 python-dotenv
+requests
+websocket-client
+xrpl-py
