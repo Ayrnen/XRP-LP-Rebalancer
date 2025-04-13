@@ -12,3 +12,6 @@ class TokenClient:
             'token1': 'XRP',
             'token2': 'RLUSD',
         }
+    
+    def convert_to_usd(self, token, balance):
+        pass
