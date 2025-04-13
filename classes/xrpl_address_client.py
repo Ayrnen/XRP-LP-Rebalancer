@@ -33,8 +33,16 @@ class XRPLAddressClient:
     def get_transaction_count(self):
         pass
     
-    def get_lp_position(self, token1, token2):
-        return self.rpc.get_amm_position(self.address, token1, token2)
+    def get_lp_balance(self, lp_issuer, lp_token):
+        try:
+            raw_data = self.rpc.get_amm_position(self.address, lp_issuer, lp_token)
+            parsed_data = self._parse_lp_balance(raw_data)
+        except:
+            return None, 'Error retrieving balance'
+        return parsed_data
+    
+    def _parse_lp_balance(self, raw_data):
+        return raw_data['result']['lines'][0]['balance'], None
 
     async def get_pending_txns(self):
         pass
