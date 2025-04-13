@@ -25,19 +25,25 @@ if __name__ == '__main__':
     # connected, status_message = rpc.validate_connection_wss()
     # print(f"Connected: {connected} | Status: {status_message}")
      
-    # load_dotenv()
-    # address = os.getenv('TEST_ADDRESS')
-    # address_client = XRPLAddressClient(address)
-    # print(address_client._validate_address())
-    # print(address_client.get_balance_xrp())
+    load_dotenv()
+    address = os.getenv('TEST_ADDRESS')
+    address_client = XRPLAddressClient(address)
 
-    amm = AMMClient()
+    print(address_client.get_balance_xrp())
+
+    lp_token = config_reader.get_value('mainnet-lp-tokens', 'xrp_rlusd')
+    lp_issuer = config_reader.get_value('mainnet-lp-issuers', 'xrp_rlusd')
+
+    print(address_client.get_lp_balance(lp_issuer, lp_token))
+
+
+    # amm = AMMClient()
     # token1 = 'XRP'
-    token1 = config_reader.get_value('mainnet-token-addresses', 'rlusd')
-    token2 = config_reader.get_value('mainnet-token-addresses', 'mag')
-    issuer = config_reader.get_value('mainnet-amm-info', 'xrp_rlusd_issuer')
-    amm_info = amm.get_amm_details(issuer, token1, token2)
-    print(amm_info)
+    # token1 = config_reader.get_value('mainnet-token-addresses', 'rlusd')
+    # token2 = config_reader.get_value('mainnet-token-addresses', 'mag')
+    # issuer = config_reader.get_value('mainnet-lp-issuers', 'xrp_rlusd')
+    # amm_info = amm.get_amm_details(issuer, token1, token2)
+    # print(amm_info)
     
 
     runtime_tracker.stop()
