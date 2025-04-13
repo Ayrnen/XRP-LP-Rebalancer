@@ -32,8 +32,9 @@ if __name__ == '__main__':
     # print(address_client.get_balance_xrp())
 
     amm = AMMClient()
-    token1 = 'XRP'
-    token2 = config_reader.get_value('mainnet-token-addresses', 'rlusd')
+    # token1 = 'XRP'
+    token1 = config_reader.get_value('mainnet-token-addresses', 'rlusd')
+    token2 = config_reader.get_value('mainnet-token-addresses', 'mag')
     issuer = config_reader.get_value('mainnet-amm-info', 'xrp_rlusd_issuer')
     amm_info = amm.get_amm_details(issuer, token1, token2)
     print(amm_info)
