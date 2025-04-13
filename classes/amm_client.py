@@ -13,19 +13,31 @@ class AMMClient:
         return parsed_data
 
     def _parse_amm_details(self, raw_data, code1, code2):
-        print(raw_data)
-        data = raw_data[0]['amm']
+        try:
+            amm_data = raw_data[0]['amm']
+            dict_return = {
+                'lp_token': amm_data['lp_token']['currency'],
+                'lp_issuer': amm_data['lp_token']['issuer'],
+                'lp_token_amount': amm_data['lp_token']['value'],
 
-        dict_return = {
-            'lp_token': data['lp_token']['currency'],
-            'lp_issuer': data['lp_token']['issuer'],
-            # value?
-            f'{code1}_frozen': data.get('asset1_frozen', None),
-            f'{code2}_frozen': data.get('asset2_frozen', None),
-        }
-        
-        print(data)
-        print(type(data))
+                'asset1': code1,
+                'asset2': code2,
+                'asset1_frozen': amm_data.get('asset_frozen', None),
+                'asset2_frozen': amm_data.get('asset2_frozen', None),
+                'asset2_issuer': amm_data['amount2']['issuer'],
+                'asset2_amount': amm_data['amount2']['value'],
+            }
+            if type(amm_data['amount']) == str:
+                dict_return['asset1_issuer'] = None
+                dict_return['asset1_amount'] = float(amm_data['amount']) / 1000000
+            elif type(amm_data['amount']) == dict:
+                dict_return['asset1_issuer'] = amm_data['amount']['issuer']
+                dict_return['asset1_amount'] = amm_data['amount']['value']
+            else:
+                raise ValueError(f'Unexpected type for "amount": {type(amm_data["amount"])}')
+        except:
+            raise ValueError(f'Unexpected response from AMM API: {raw_data}')
+    
         return dict_return
 
     def hex_to_code(self, token_input):
