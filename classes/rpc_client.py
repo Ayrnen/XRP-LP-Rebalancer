@@ -119,7 +119,7 @@ class RPCClient:
         except Exception as e:
             return None, f'Connection error: {str(e)}'
         
-    def _validate_parse_token(self, token: str) -> dict:
+    def _validate_parse_token(self, token) -> dict:
         if token.upper() == 'XRP':
             return {'currency': 'XRP'}
             
@@ -130,3 +130,31 @@ class RPCClient:
                 return {'currency': currency, 'issuer': issuer}
                 
         raise ValueError(f'Invalid asset format: {token}')
+    
+    def get_amm_position(self, account, lp_issuer, lp_token):
+        try:
+            payload = {
+                'method': 'account_lines',
+                'params': [{
+                    'account': account,
+                    'peer': lp_issuer,
+                    'currency': lp_token
+                }]
+            }
+
+            response = requests.post(
+                self.http_url,
+                json=payload,
+                timeout=5
+            )
+            
+            data = response.json()
+            
+            if error := data.get('error'):
+                return None, error.get('message', 'RPC error')
+            
+            return data
+            
+
+        except Exception as e:
+            return None, f'Error retrieving balance: {str(e)}'
