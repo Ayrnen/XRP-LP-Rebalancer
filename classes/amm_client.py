@@ -53,6 +53,10 @@ class AMMClient:
                 decoded = bytes_data.decode('utf-8').rstrip('\x00')
                 return decoded.lower()
 
+    # Turns LP tokens count into pair token count
+    def get_position_breakdown(self):
+        pass
+
     # To eventually cache AMM details
     def populate_amm_details(self, issuer, token1, token2):
         pass
