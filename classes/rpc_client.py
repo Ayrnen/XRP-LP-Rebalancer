@@ -153,8 +153,38 @@ class RPCClient:
             if error := data.get('error'):
                 return None, error.get('message', 'RPC error')
             
-            return data
+            return data, None
             
 
         except Exception as e:
             return None, f'Error retrieving balance: {str(e)}'
+
+    def get_token_trust_line(self, wallet_address, token):
+        token_details = self._validate_parse_token(token)
+        payload = {
+            'method': 'account_lines',
+            'params': [{
+                'account': wallet_address,
+                'peer': token_details['issuer'],
+                'currency': token_details['currency'],
+                'ledger_index': 'validated'
+            }]
+        }
+
+        try:
+            response = requests.post(
+                self.http_url,
+                json=payload,
+                timeout=10
+            )
+            data = response.json()
+
+            if error := data.get('error'):
+                return None, f'RPC Error: {error.get("message", "Unknown error")}'
+
+            return data, None
+
+        except requests.exceptions.RequestException as e:
+            return None, f'Network error: {str(e)}'
+        except (KeyError, ValueError) as e:
+            return None, f'Invalid response format: {str(e)}'
