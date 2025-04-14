@@ -29,12 +29,16 @@ if __name__ == '__main__':
     address = os.getenv('TEST_ADDRESS')
     address_client = XRPLAddressClient(address)
 
-    print(address_client.get_balance_xrp())
+    # print(address_client.get_balance_xrp())
 
-    lp_token = config_reader.get_value('mainnet-lp-tokens', 'xrp_rlusd')
-    lp_issuer = config_reader.get_value('mainnet-lp-issuers', 'xrp_rlusd')
+    # lp_token = config_reader.get_value('mainnet-lp-tokens', 'xrp_rlusd')
+    # lp_issuer = config_reader.get_value('mainnet-lp-issuers', 'xrp_rlusd')
 
-    print(address_client.get_lp_balance(lp_issuer, lp_token))
+    # print(address_client.get_lp_balance(lp_issuer, lp_token))
+    rlusd = config_reader.get_value('mainnet-token-addresses', 'rlusd')
+    print(address_client.get_balance_token(rlusd))
+
+    print(address_client.get_trust_line_info(rlusd))
 
 
     # amm = AMMClient()
