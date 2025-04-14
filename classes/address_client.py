@@ -1,5 +1,6 @@
 from classes.config_reader import ConfigReader
 from classes.rpc_client import RPCClient
+from classes.amm_client import AMMClient
 from xrpl.core import addresscodec
 from xrpl.core.addresscodec import XRPLAddressCodecException
 
@@ -7,6 +8,7 @@ class AddressClient:
     def __init__(self, address):
         self.config = ConfigReader()
         self.rpc = RPCClient()
+        self.amm = AMMClient()
         self.address = address
         self._validate_address()
 
@@ -69,3 +71,9 @@ class AddressClient:
 
     async def get_pending_txns(self):
         pass
+
+
+    def get_lp_breakdown(self, lp_token, lp_issuer, token1, token2):
+        lp_token_amount = self.get_lp_balance(lp_issuer, lp_token)
+        breakdown_data = self.amm.get_position_breakdown(lp_issuer, token1, token2, lp_token_amount)
+        return breakdown_data

@@ -31,14 +31,16 @@ if __name__ == '__main__':
 
     # print(address_client.get_balance_xrp())
 
-    # lp_token = config_reader.get_value('mainnet-lp-tokens', 'xrp_rlusd')
-    # lp_issuer = config_reader.get_value('mainnet-lp-issuers', 'xrp_rlusd')
+    lp_token = config_reader.get_value('mainnet-lp-tokens', 'xrp_rlusd')
+    lp_issuer = config_reader.get_value('mainnet-lp-issuers', 'xrp_rlusd')
 
     # print(address_client.get_lp_balance(lp_issuer, lp_token))
+    xrp = 'XRP'
     rlusd = config_reader.get_value('mainnet-token-addresses', 'rlusd')
-    print(address_client.get_balance_token(rlusd))
+    print(address_client.get_lp_breakdown(lp_token, lp_issuer, xrp, rlusd))
+    # print(address_client.get_balance_token(rlusd))
 
-    print(address_client.get_trust_line_info(rlusd))
+    # print(address_client.get_trust_line_info(rlusd))
 
 
     # amm = AMMClient()

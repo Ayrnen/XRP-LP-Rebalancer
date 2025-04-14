@@ -94,7 +94,6 @@ class AMMClient:
                 }
             }
 
-            # Add XRP conversion if applicable
             if amm_details['asset1'] == 'xrp':
                 breakdown['assets']['xrp']['amount_xrp'] = asset1_amount
             if amm_details['asset2'] == 'xrp':
