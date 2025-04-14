@@ -54,8 +54,61 @@ class AMMClient:
                 return decoded.lower()
 
     # Turns LP tokens count into pair token count
-    def get_position_breakdown(self):
-        pass
+    def get_position_breakdown(self, lp_issuer, token1, token2, lp_token_amount):
+        try:
+            amm_details = self.get_amm_details(lp_issuer, token1, token2)
+            
+            total_lp = float(amm_details['lp_token_amount'])
+            asset1_reserve = float(amm_details['asset1_amount'])
+            asset2_reserve = float(amm_details['asset2_amount'])
+            
+            if total_lp <= 0:
+                raise ValueError("Invalid total LP supply - pool may be inactive")
+                
+            ownership_pct = lp_token_amount / total_lp
+            asset1_amount = ownership_pct * asset1_reserve
+            asset2_amount = ownership_pct * asset2_reserve
+
+            breakdown = {
+                'lp_tokens': lp_token_amount,
+                'ownership_percentage': round(ownership_pct * 100, 4),
+                'assets': {
+                    amm_details['asset1']: {
+                        'amount': asset1_amount,
+                        'issuer': amm_details.get('asset1_issuer'),
+                        'type': 'XRP' if amm_details['asset1'] == 'xrp' else 'issued'
+                    },
+                    amm_details['asset2']: {
+                        'amount': asset2_amount,
+                        'issuer': amm_details['asset2_issuer'],
+                        'type': 'XRP' if amm_details['asset2'] == 'xrp' else 'issued'
+                    }
+                },
+                'pool_metrics': {
+                    'total_liquidity': total_lp,
+                    'trading_fee_bps': amm_details.get('trading_fee', 'N/A'),
+                    'frozen_status': {
+                        'asset1': amm_details.get('asset1_frozen', False),
+                        'asset2': amm_details.get('asset2_frozen', False)
+                    }
+                }
+            }
+
+            # Add XRP conversion if applicable
+            if amm_details['asset1'] == 'xrp':
+                breakdown['assets']['xrp']['amount_xrp'] = asset1_amount
+            if amm_details['asset2'] == 'xrp':
+                breakdown['assets']['xrp']['amount_xrp'] = asset2_amount
+
+            return breakdown
+
+        except KeyError as e:
+            raise ValueError(f"Missing required field in AMM data: {str(e)}")
+        except ZeroDivisionError:
+            raise ValueError("Pool has zero liquidity - position cannot be calculated")
+        except Exception as e:
+            raise ValueError(f"Error calculating position: {str(e)}")
+
 
     # To eventually cache AMM details
     def populate_amm_details(self, issuer, token1, token2):
