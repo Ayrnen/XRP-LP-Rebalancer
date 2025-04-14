@@ -27,22 +27,45 @@ class XRPLAddressClient:
     def get_balance_xrp(self):
         return self.rpc.get_account_balance(self.address)
     
+    def get_trust_line_info(self, token_address):
+        try:
+            raw_data, error = self.rpc.get_token_trust_line(self.address, token_address)
+            if error:
+                return None, error
+            parsed_data = self._parse_trust_line_info(raw_data)
+        except:
+            return None, 'Error trust line information'
+        return parsed_data, None
+    def _parse_trust_line_info(self, raw_data):
+        raise NotImplementedError('Parsing trust line information not implemented')
+    
     def get_balance_token(self, token_address):
-        pass
+        try:
+            raw_data, error = self.rpc.get_token_trust_line(self.address, token_address)
+            if error:
+                return None, error
+            parsed_data = self._parse_token_balance(raw_data)
+        except:
+            return None, 'Error retrieving balance'
+        return parsed_data, None
+    def _parse_token_balance(self, raw_data):
+        return raw_data['result']['lines'][0]['balance']
+        
 
     def get_transaction_count(self):
         pass
     
     def get_lp_balance(self, lp_issuer, lp_token):
         try:
-            raw_data = self.rpc.get_amm_position(self.address, lp_issuer, lp_token)
+            raw_data, error = self.rpc.get_amm_position(self.address, lp_issuer, lp_token)
+            if error:
+                return None, error
             parsed_data = self._parse_lp_balance(raw_data)
         except:
             return None, 'Error retrieving balance'
-        return parsed_data
-    
+        return parsed_data, None
     def _parse_lp_balance(self, raw_data):
-        return raw_data['result']['lines'][0]['balance'], None
+        return raw_data['result']['lines'][0]['balance']
 
     async def get_pending_txns(self):
         pass
