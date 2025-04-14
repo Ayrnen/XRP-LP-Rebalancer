@@ -3,7 +3,7 @@ from classes.rpc_client import RPCClient
 from xrpl.core import addresscodec
 from xrpl.core.addresscodec import XRPLAddressCodecException
 
-class XRPLAddressClient:
+class AddressClient:
     def __init__(self, address):
         self.config = ConfigReader()
         self.rpc = RPCClient()

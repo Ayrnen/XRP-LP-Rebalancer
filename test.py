@@ -1,7 +1,7 @@
 from classes.config_reader import ConfigReader
 from classes.runtime_tracker import RuntimeTracker
 from classes.rpc_client import RPCClient
-from classes.xrpl_address_client import XRPLAddressClient
+from classes.address_client import AddressClient
 from classes.amm_client import AMMClient
 
 from dotenv import load_dotenv
@@ -27,7 +27,7 @@ if __name__ == '__main__':
      
     load_dotenv()
     address = os.getenv('TEST_ADDRESS')
-    address_client = XRPLAddressClient(address)
+    address_client = AddressClient(address)
 
     # print(address_client.get_balance_xrp())
 
