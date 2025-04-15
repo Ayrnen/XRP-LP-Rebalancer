@@ -159,6 +159,6 @@ class RPCClient:
         data = response.json()
 
         if error := data.get('error'):
-            return None, f'RPC Error: {error.get("message", "Unknown error")}'
+            return f'RPC Error: {error.get("message", "Unknown error")}'
 
         return data
