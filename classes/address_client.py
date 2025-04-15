@@ -65,7 +65,7 @@ class AddressClient:
             parsed_data = self._parse_lp_balance(raw_data)
         except:
             return None, 'Error retrieving balance'
-        return parsed_data, None
+        return float(parsed_data)
     def _parse_lp_balance(self, raw_data):
         return raw_data['result']['lines'][0]['balance']
 
