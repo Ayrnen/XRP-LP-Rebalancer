@@ -7,10 +7,7 @@ class ConfigReader:
         self._load_config()
 
     def _load_config(self):
-        try:
-            self.config.read(self.config_file)
-        except Exception as e:
-            raise ValueError(f'Error reading config file: {self.config_file}. {e}')
+        self.config.read(self.config_file)
 
     def get_section(self, section):
         return {key: value for key, value in self.config[section].items()}
