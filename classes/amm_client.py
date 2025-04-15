@@ -13,7 +13,7 @@ class AMMClient:
         return parsed_data
 
     def _parse_amm_details(self, raw_data, code1, code2):
-        amm_data = raw_data[0]['amm']
+        amm_data = raw_data['amm']
         dict_return = {
             'lp_token': amm_data['lp_token']['currency'],
             'lp_issuer': amm_data['lp_token']['issuer'],
