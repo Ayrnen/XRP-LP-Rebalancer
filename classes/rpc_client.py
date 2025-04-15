@@ -98,8 +98,8 @@ class RPCClient:
                 'params': [{
                     'asset': asset1,
                     'asset2': asset2,
-                    # 'account': 'rsmjkQ2gVj9wDHAFRrj1XS9yayWjp7Tq7b' # Replace with actual issuer address # RLUSD
-                    'account': 'rfcbRoa6A4HbAKPKooM4ZRCXzH2XvEqd9e' # MAG
+                    'account': 'rsmjkQ2gVj9wDHAFRrj1XS9yayWjp7Tq7b' # Replace with actual issuer address # RLUSD
+                    # 'account': 'rfcbRoa6A4HbAKPKooM4ZRCXzH2XvEqd9e' # MAG
                 }]
             }
             response = requests.post(
