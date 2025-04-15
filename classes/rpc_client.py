@@ -48,6 +48,8 @@ class RPCClient:
 
         except requests.exceptions.RequestException as e:
             return False, f'Connection failed: {str(e)}'
+        except Exception as e:
+            return False, f'Unknown Error {str(e)}'
         
 
     def get_account_balance(self, address):
@@ -59,66 +61,49 @@ class RPCClient:
             }]
         }
 
-        try:
-            response = requests.post(
-                self.http_url,
-                json=payload,
-                timeout=5
-            )
-            response.raise_for_status()
-            data = response.json()
+        response = requests.post(
+            self.http_url,
+            json=payload,
+            timeout=5
+        )
+        response.raise_for_status()
+        data = response.json()
 
-            if 'error' in data:
-                return None, f"RPC Error: {data['error'].get('message', 'Unknown error')}"
+        if 'error' in data:
+            raise f"RPC Error: {data['error'].get('message', 'Unknown error')}"
 
-            balance_drops = data.get('result', {})\
-                                .get('account_data', {})\
-                                .get('Balance')
-            
-            if not balance_drops:
-                return None, 'No balance found in response'
-            
-            return int(balance_drops) / 1_000_000, None  # Convert drops to XRP
+        balance_drops = float(data['result']['account_data']['Balance'])
+        balance_xrp = balance_drops/1_000_000
 
-        except requests.exceptions.RequestException as e:
-            return None, f'Connection error: {str(e)}'
-        except ValueError:
-            return None, 'Invalid JSON response'
-        except KeyError:
-            return None, 'Unexpected response format'
+        return balance_xrp
         
 
     def get_amm_details(self, issuer, token1, token2):
-        try:
-            asset1 = self._validate_parse_token(token1)
-            asset2 = self._validate_parse_token(token2)
-            
-            payload = {
-                'method': 'amm_info',
-                'params': [{
-                    'asset': asset1,
-                    'asset2': asset2,
-                    'account': 'rsmjkQ2gVj9wDHAFRrj1XS9yayWjp7Tq7b' # Replace with actual issuer address # RLUSD
-                    # 'account': 'rfcbRoa6A4HbAKPKooM4ZRCXzH2XvEqd9e' # MAG
-                }]
-            }
-            response = requests.post(
-                self.http_url,
-                json=payload,
-                timeout=5
-            )
-            
-            data = response.json()
-            if error := data.get('error'):
-                return None, error.get('message', 'Unknown RPC error')
-                
-            return data.get('result'), None
-
-        except ValueError as e:
-            return None, str(e)
-        except Exception as e:
-            return None, f'Connection error: {str(e)}'
+        asset1 = self._validate_parse_token(token1)
+        asset2 = self._validate_parse_token(token2)
         
+        payload = {
+            'method': 'amm_info',
+            'params': [{
+                'asset': asset1,
+                'asset2': asset2,
+                'account': 'rsmjkQ2gVj9wDHAFRrj1XS9yayWjp7Tq7b' # Replace with actual issuer address # RLUSD
+                # 'account': 'rfcbRoa6A4HbAKPKooM4ZRCXzH2XvEqd9e' # MAG
+            }]
+        }
+        response = requests.post(
+            self.http_url,
+            json=payload,
+            timeout=5
+        )
+        
+        data = response.json()
+        if error := data.get('error'):
+            return None, error.get('message', 'Unknown RPC error')
+            
+        return data.get('result')
+        
+
     def _validate_parse_token(self, token) -> dict:
         if token.upper() == 'XRP':
             return {'currency': 'XRP'}
@@ -132,32 +117,27 @@ class RPCClient:
         raise ValueError(f'Invalid asset format: {token}')
     
     def get_amm_position(self, account, lp_issuer, lp_token):
-        try:
-            payload = {
-                'method': 'account_lines',
-                'params': [{
-                    'account': account,
-                    'peer': lp_issuer,
-                    'currency': lp_token
-                }]
-            }
+        payload = {
+            'method': 'account_lines',
+            'params': [{
+                'account': account,
+                'peer': lp_issuer,
+                'currency': lp_token
+            }]
+        }
 
-            response = requests.post(
-                self.http_url,
-                json=payload,
-                timeout=5
-            )
-            
-            data = response.json()
-            
-            if error := data.get('error'):
-                return None, error.get('message', 'RPC error')
-            
-            return data, None
-            
-
-        except Exception as e:
-            return None, f'Error retrieving balance: {str(e)}'
+        response = requests.post(
+            self.http_url,
+            json=payload,
+            timeout=5
+        )
+        
+        data = response.json()
+        
+        if error := data.get('error'):
+            return error.get('message', 'RPC error')
+        
+        return data
 
     def get_token_trust_line(self, wallet_address, token):
         token_details = self._validate_parse_token(token)
@@ -171,20 +151,14 @@ class RPCClient:
             }]
         }
 
-        try:
-            response = requests.post(
-                self.http_url,
-                json=payload,
-                timeout=10
-            )
-            data = response.json()
+        response = requests.post(
+            self.http_url,
+            json=payload,
+            timeout=10
+        )
+        data = response.json()
 
-            if error := data.get('error'):
-                return None, f'RPC Error: {error.get("message", "Unknown error")}'
+        if error := data.get('error'):
+            return None, f'RPC Error: {error.get("message", "Unknown error")}'
 
-            return data, None
-
-        except requests.exceptions.RequestException as e:
-            return None, f'Network error: {str(e)}'
-        except (KeyError, ValueError) as e:
-            return None, f'Invalid response format: {str(e)}'
+        return data
