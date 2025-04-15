@@ -3,6 +3,7 @@ from classes.runtime_tracker import RuntimeTracker
 from classes.rpc_client import RPCClient
 from classes.address_client import AddressClient
 from classes.amm_client import AMMClient
+from classes.coingecko_client import CoinGeckoClient
 
 from dotenv import load_dotenv
 import os
@@ -26,7 +27,7 @@ if __name__ == '__main__':
     # print(f"Connected: {connected} | Status: {status_message}")
      
     load_dotenv()
-    address = os.getenv('TEST_ADDRESS')
+    address = os.getenv('ADDRESS')
     address_client = AddressClient(address)
 
     # print(address_client.get_balance_xrp())
@@ -37,7 +38,9 @@ if __name__ == '__main__':
     # print(address_client.get_lp_balance(lp_issuer, lp_token))
     xrp = 'XRP'
     rlusd = config_reader.get_value('mainnet-token-addresses', 'rlusd')
-    print(address_client.get_lp_breakdown(lp_token, lp_issuer, xrp, rlusd))
+    breakdown = address_client.get_lp_breakdown(lp_token, lp_issuer, xrp, rlusd)
+
+
     # print(address_client.get_balance_token(rlusd))
 
     # print(address_client.get_trust_line_info(rlusd))
@@ -51,5 +54,17 @@ if __name__ == '__main__':
     # amm_info = amm.get_amm_details(issuer, token1, token2)
     # print(amm_info)
     
+    cg = CoinGeckoClient()
+    xrp_id = config_reader.get_value('coingecko-token-ids', 'xrp')
+    xrp_price = cg.get_token_value_usd(xrp_id)
+    print(xrp_price)
+
+    rlusd_id = config_reader.get_value('coingecko-token-ids', 'rlusd')
+    rlusd_price = cg.get_token_value_usd(rlusd_id)
+    print(rlusd_price)
+
+    print(f'Dollar value of XRP portion of LP Position: {breakdown['assets']['xrp']['amount']*xrp_price}')
+    print(f'Dollar value of RLUSD portion of LP Position: {breakdown['assets']['rlusd']['amount']*rlusd_price}')
+
 
     runtime_tracker.stop()
