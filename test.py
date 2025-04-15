@@ -63,8 +63,8 @@ if __name__ == '__main__':
     rlusd_price = cg.get_token_value_usd(rlusd_id)
     print(rlusd_price)
 
-    print(f'Dollar value of XRP portion of LP Position: {breakdown['assets']['xrp']['amount']*xrp_price}')
-    print(f'Dollar value of RLUSD portion of LP Position: {breakdown['assets']['rlusd']['amount']*rlusd_price}')
+    print(f"Dollar value of XRP portion of LP Position: {breakdown['assets']['xrp']['amount']*xrp_price}")
+    print(f"Dollar value of RLUSD portion of LP Position: {breakdown['assets']['rlusd']['amount']*rlusd_price}")
 
 
     runtime_tracker.stop()
