@@ -38,7 +38,7 @@ class DatabaseManager:
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 snapshot_id INTEGER NOT NULL,
                 token_id TEXT NOT NULL,
-                token_symbol TEXT NOT NULL,`
+                token_symbol TEXT NOT NULL,
                 usd_price REAL NOT NULL,
                 FOREIGN KEY (snapshot_id) REFERENCES snapshots (id)
             )
@@ -195,4 +195,3 @@ class DatabaseManager:
             )
         )
         conn.commit()
-
