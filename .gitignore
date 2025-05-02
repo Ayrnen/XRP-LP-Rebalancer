@@ -2,3 +2,7 @@
 __pycache__/
 *.pyc
 jsonreader.json
+logs/
+*.db
+.DS_Store
+xrp/
