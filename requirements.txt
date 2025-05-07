@@ -1,5 +1,6 @@
 boto3
 python-dotenv
+psycopg2-binary
 requests
 websocket-client
 xrpl-py
