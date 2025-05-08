@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Script to apply PostgreSQL migration for XRP LP Rebalancer
+Script to apply database migration for XRP LP Rebalancer
 """
 
 import os
@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def get_postgres_connection():
+def get_database_connection():
     return psycopg2.connect(
         dbname=os.getenv('PGDATABASE', 'xrp'),
         user=os.getenv('PGUSER'),
@@ -27,8 +27,8 @@ def apply_migration(migration_file='01_create_tables.sql'):
     with open(migration_path, 'r') as f:
         migration_sql = f.read()
     
-    # Connect to PostgreSQL and execute the migration
-    conn = get_postgres_connection()
+    # Connect to database and execute the migration
+    conn = get_database_connection()
     cursor = conn.cursor()
     
     try:
