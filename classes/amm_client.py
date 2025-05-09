@@ -14,10 +14,34 @@ class AMMClient:
 
     def _parse_amm_details(self, raw_data, code1, code2):
         amm_data = raw_data['amm']
+        
+        # Check if lp_token_amount is present and valid
+        lp_token_amount = 0
+        if 'lp_token' in amm_data and 'value' in amm_data['lp_token']:
+            lp_token_amount = amm_data['lp_token']['value']
+        
+        # If lp_token_amount is 0 or missing, calculate it based on the AMM formula
+        # LP tokens = sqrt(asset1_amount * asset2_amount)
+        if float(lp_token_amount) <= 0:
+            asset1_amount = 0
+            asset2_amount = 0
+            
+            if type(amm_data['amount']) == str:
+                asset1_amount = float(amm_data['amount']) / 1000000
+            elif type(amm_data['amount']) == dict and 'value' in amm_data['amount']:
+                asset1_amount = float(amm_data['amount']['value'])
+                
+            if 'amount2' in amm_data and 'value' in amm_data['amount2']:
+                asset2_amount = float(amm_data['amount2']['value'])
+                
+            if asset1_amount > 0 and asset2_amount > 0:
+                import math
+                lp_token_amount = math.sqrt(asset1_amount * asset2_amount)
+        
         dict_return = {
             'lp_token': amm_data['lp_token']['currency'],
             'lp_issuer': amm_data['lp_token']['issuer'],
-            'lp_token_amount': amm_data['lp_token']['value'],
+            'lp_token_amount': lp_token_amount,
 
             'asset1': code1,
             'asset2': code2,
@@ -58,8 +82,32 @@ class AMMClient:
         asset1_reserve = float(amm_details['asset1_amount'])
         asset2_reserve = float(amm_details['asset2_amount'])
         
-        if total_lp <= 0:
-            raise ValueError("Invalid total LP supply - pool may be inactive")
+        # If user has no LP tokens or total LP supply is invalid, return zero values
+        if lp_token_amount <= 0 or total_lp <= 0:
+            return {
+                'lp_tokens': lp_token_amount,
+                'ownership_percentage': 0,
+                'assets': {
+                    amm_details['asset1']: {
+                        'amount': 0,
+                        'issuer': amm_details.get('asset1_issuer'),
+                        'type': 'XRP' if amm_details['asset1'] == 'xrp' else 'issued'
+                    },
+                    amm_details['asset2']: {
+                        'amount': 0,
+                        'issuer': amm_details['asset2_issuer'],
+                        'type': 'XRP' if amm_details['asset2'] == 'xrp' else 'issued'
+                    }
+                },
+                'pool_metrics': {
+                    'total_liquidity': total_lp,
+                    'trading_fee_bps': amm_details.get('trading_fee', 'N/A'),
+                    'frozen_status': {
+                        'asset1': amm_details.get('asset1_frozen', False),
+                        'asset2': amm_details.get('asset2_frozen', False)
+                    }
+                }
+            }
             
         ownership_pct = lp_token_amount / total_lp
         asset1_amount = ownership_pct * asset1_reserve

@@ -35,7 +35,11 @@ class AddressClient:
         parsed_data = self._parse_token_balance(raw_data)
         return parsed_data, None
     def _parse_token_balance(self, raw_data):
-        return raw_data['result']['lines'][0]['balance']
+        # Check if there are any lines (user has a trust line for this token)
+        if 'result' in raw_data and 'lines' in raw_data['result'] and len(raw_data['result']['lines']) > 0:
+            return raw_data['result']['lines'][0]['balance']
+        # If no lines, return 0 (user has no trust line for this token)
+        return 0
         
 
     def get_transaction_count(self):
@@ -46,7 +50,11 @@ class AddressClient:
         parsed_data = self._parse_lp_balance(raw_data)
         return float(parsed_data)
     def _parse_lp_balance(self, raw_data):
-        return raw_data['result']['lines'][0]['balance']
+        # Check if there are any lines (user has LP tokens)
+        if 'result' in raw_data and 'lines' in raw_data['result'] and len(raw_data['result']['lines']) > 0:
+            return raw_data['result']['lines'][0]['balance']
+        # If no lines, return 0 (user has no LP tokens)
+        return 0
 
     def get_lp_breakdown(self, lp_token, lp_issuer, token1, token2):
         lp_token_amount = self.get_lp_balance(lp_issuer, lp_token)
