@@ -11,7 +11,7 @@ from classes.runtime_tracker import RuntimeTracker
 from classes.rpc_client import RPCClient
 from classes.address_client import AddressClient
 from classes.amm_client import AMMClient
-from classes.coingecko_client import CoinGeckoClient
+from classes.coinmarketcap_client import CoinMarketCapClient
 from classes.database_manager import DatabaseManager
 
 class DataCollector:
@@ -19,7 +19,7 @@ class DataCollector:
         self.db_manager = DatabaseManager()
         self.config_reader = ConfigReader()
         self.runtime_tracker = RuntimeTracker()
-        self.cg_client = CoinGeckoClient()
+        self.cmc_client = CoinMarketCapClient()
         
         # Load address from environment
         load_dotenv()
@@ -41,12 +41,12 @@ class DataCollector:
             snapshot_id = self.db_manager.create_snapshot("price_data")
             
             # Get token IDs from config
-            token_ids_section = "coingecko-token-ids"
+            token_ids_section = "coinmarketcap-token-ids"
             token_ids = self.config_reader.get_section(token_ids_section)
             
             for token_symbol, token_id in token_ids.items():
                 try:
-                    price = self.cg_client.get_token_value_usd(token_id)
+                    price = self.cmc_client.get_token_value_usd(token_id)
                     
                     # Store in database
                     self.db_manager.insert_price_data(snapshot_id, token_id, token_symbol, price)
@@ -109,8 +109,8 @@ class DataCollector:
             xrp_balance = self.address_client.get_balance_xrp()
             
             # Get XRP price
-            xrp_id = self.config_reader.get_value("coingecko-token-ids", "xrp")
-            xrp_price = self.cg_client.get_token_value_usd(xrp_id)
+            xrp_id = self.config_reader.get_value("coinmarketcap-token-ids", "xrp")
+            xrp_price = self.cmc_client.get_token_value_usd(xrp_id)
             xrp_usd_value = xrp_balance * xrp_price
             
             # Store XRP balance
@@ -127,7 +127,7 @@ class DataCollector:
             
             # Get token balances
             token_addresses = self.config_reader.get_section("mainnet-token-addresses")
-            token_ids = self.config_reader.get_section("coingecko-token-ids")
+            token_ids = self.config_reader.get_section("coinmarketcap-token-ids")
             
             for token_name, token_address in token_addresses.items():
                 try:
@@ -142,7 +142,7 @@ class DataCollector:
                     usd_value = None
                     if token_name in token_ids:
                         token_id = token_ids[token_name]
-                        token_price = self.cg_client.get_token_value_usd(token_id)
+                        token_price = self.cmc_client.get_token_value_usd(token_id)
                         usd_value = float(token_balance) * token_price
                     
                     # Parse token issuer
@@ -181,7 +181,7 @@ class DataCollector:
             lp_tokens = self.config_reader.get_section("mainnet-lp-tokens")
             lp_issuers = self.config_reader.get_section("mainnet-lp-issuers")
             token_addresses = self.config_reader.get_section("mainnet-token-addresses")
-            token_ids = self.config_reader.get_section("coingecko-token-ids")
+            token_ids = self.config_reader.get_section("coinmarketcap-token-ids")
             
             for pair_name, lp_token in lp_tokens.items():
                 try:
@@ -218,7 +218,7 @@ class DataCollector:
                         asset1_amount = breakdown['assets'][asset1_name]['amount']
                         if asset1_name in token_ids:
                             token1_id = token_ids[asset1_name]
-                            token1_price = self.cg_client.get_token_value_usd(token1_id)
+                            token1_price = self.cmc_client.get_token_value_usd(token1_id)
                             asset1_value = asset1_amount * token1_price
                         
                         # Get asset2 value
@@ -226,7 +226,7 @@ class DataCollector:
                         asset2_amount = breakdown['assets'][asset2_name]['amount']
                         if asset2_name in token_ids:
                             token2_id = token_ids[asset2_name]
-                            token2_price = self.cg_client.get_token_value_usd(token2_id)
+                            token2_price = self.cmc_client.get_token_value_usd(token2_id)
                             asset2_value = asset2_amount * token2_price
                         
                         total_usd_value = asset1_value + asset2_value
