@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Navigate to the project directory
-cd "$HOME/Documents/XRP-LP-Rebalancer"
+cd "$HOME/Projects/XRP-LP-Rebalancer"
 
 # Activate the xrp virtual environment
 source xrp/bin/activate
