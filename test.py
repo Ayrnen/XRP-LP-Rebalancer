@@ -3,7 +3,7 @@ from classes.runtime_tracker import RuntimeTracker
 from classes.rpc_client import RPCClient
 from classes.address_client import AddressClient
 from classes.amm_client import AMMClient
-from classes.coingecko_client import CoinGeckoClient
+from classes.coinmarketcap_client import CoinMarketCapClient
 
 from dotenv import load_dotenv
 import os
@@ -54,13 +54,13 @@ if __name__ == '__main__':
     # amm_info = amm.get_amm_details(issuer, token1, token2)
     # print(amm_info)
     
-    cg = CoinGeckoClient()
-    xrp_id = config_reader.get_value('coingecko-token-ids', 'xrp')
-    xrp_price = cg.get_token_value_usd(xrp_id)
+    cm = CoinMarketCapClient()
+    xrp_id = config_reader.get_value('coinmarketcap-token-ids', 'xrp')
+    xrp_price = cm.get_token_value_usd(xrp_id)
     print(xrp_price)
 
-    rlusd_id = config_reader.get_value('coingecko-token-ids', 'rlusd')
-    rlusd_price = cg.get_token_value_usd(rlusd_id)
+    rlusd_id = config_reader.get_value('coinmarketcap-token-ids', 'rlusd')
+    rlusd_price = cm.get_token_value_usd(rlusd_id)
     print(rlusd_price)
 
     print(f"Dollar value of XRP portion of LP Position: {breakdown['assets']['xrp']['amount']*xrp_price}")
